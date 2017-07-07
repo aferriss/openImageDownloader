@@ -1,8 +1,15 @@
 import shutil
 import requests
 import json
+import sys
 import os
 import errno
+import argparse
+
+parser = argparse.ArgumentParser(description="Downloads Images from Open Image database.")
+parser.add_argument('-d','--dest', help='output folder name')
+parser.add_argument('-j','--json', help='json database file name or location')
+args = parser.parse_args()
 
 def makeDir(path):
     try:
@@ -11,8 +18,8 @@ def makeDir(path):
         if exception.errno != errno.EEXIST:
             raise
 
-outputFolder = 'desert' 
-jsonFile = 'desert2000.json'
+outputFolder = args.dest 
+jsonFile = args.json 
 
 urls = []
 makeDir(outputFolder)
