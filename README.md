@@ -1,6 +1,8 @@
 # Open Image Dataset Maker
 
-How to find a label and download images from the open image database.
+How to find a label and download images from the [Open Images dataset.](https://github.com/openimages/dataset)
+
+The download script uses the multiprocessing library to speed up the download process.
 
 ### Step 1 - Find a label
 
@@ -53,4 +55,4 @@ Run download.py with arguments for a destination folder and the location of the 
 
 `python download.py --dest myNewDataset --json myJSONFile.json`
 
-That's it! All the files will be saved to a folder in the location that you specified. 
+That's it! All the files will be saved to a folder in the location that you specified. These SQL queries were pulled from [Google's OpenImage Page](https://cloud.google.com/bigquery/public-data/openimages) 

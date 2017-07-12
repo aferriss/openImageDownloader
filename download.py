@@ -5,11 +5,8 @@ import sys
 import os
 import errno
 import argparse
-
-parser = argparse.ArgumentParser(description="Downloads Images from Open Image database.")
-parser.add_argument('-d','--dest', help='output folder name')
-parser.add_argument('-j','--json', help='json database file name or location')
-args = parser.parse_args()
+from multiprocessing import Pool
+from progress.bar import Bar
 
 def makeDir(path):
     try:
@@ -18,21 +15,10 @@ def makeDir(path):
         if exception.errno != errno.EEXIST:
             raise
 
-outputFolder = args.dest 
-jsonFile = args.json 
-
-urls = []
-makeDir(outputFolder)
-
-for line in open(jsonFile, 'r'):
-    urls.append(json.loads(line))
-
-for u in urls:
-    url = u['original_url']
+def job(url):
     filename = os.path.basename(url) 
-    fileToSave = outputFolder + '/' + filename
+    fileToSave = args.dest + '/' + filename
     with open(fileToSave, 'wb') as f:
-        print url
         try:
             response = requests.get(url, stream=True, timeout=0.5, allow_redirects=False)
             if response.status_code == 200:
@@ -42,3 +28,22 @@ for u in urls:
                     f.write(block)
         except requests.exceptions.RequestException as e:
             print e
+
+def main():
+    makeDir(args.dest)
+    
+    urls = [json.loads(line)['original_url'] for line in open(args.json, 'r')]
+
+    pool = Pool()
+    bar = Bar('Downloading...', max=len(urls))
+    for i in pool.imap(job, urls):
+        bar.next()
+    bar.finish()
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Downloads Images from Open Image database.")
+    parser.add_argument('-d','--dest', help='output folder name')
+    parser.add_argument('-j','--json', help='json database file name or location')
+    args = parser.parse_args()
+
+    main()
