@@ -7,6 +7,7 @@ import errno
 import argparse
 from multiprocessing import Pool
 from progress.bar import Bar
+from PIL import Image
 
 def makeDir(path):
     try:
@@ -20,12 +21,14 @@ def job(url):
     fileToSave = args.dest + '/' + filename
     with open(fileToSave, 'wb') as f:
         try:
-            response = requests.get(url, stream=True, timeout=0.5, allow_redirects=False)
-            if response.status_code == 200:
-                for block in response.iter_content(1024):
-                    if not block:
-                        break
-                    f.write(block)
+            response = requests.get(url, stream=True, timeout=5.0, allow_redirects=False)
+            fileType = response.headers['Content-Type']
+            if fileType == 'image/jpeg': 
+                if response.status_code == 200:
+                    for block in response.iter_content(1024):
+                        if not block:
+                            break
+                        f.write(block)
         except requests.exceptions.RequestException as e:
             print e
 
